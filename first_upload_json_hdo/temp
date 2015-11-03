@@ -1,0 +1,3 @@
+ xmldoc.elements.each('//speech[@by=\'#dra-sandra-ovalle-garcia\']'){|e| p e}
+
+ xmldoc.elements["//speech[@by='#dra-sandra-ovalle-garcia']"]

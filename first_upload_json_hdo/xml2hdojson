@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+require 'json'
+require 'rexml/document'
+include REXML
+
+def get_xml file
+  xmldoc = Document.new(file)
+
+end
+
+def parse xmldoc
+  data = {}
+
+  data[:presidents] = { name: 'foo bar', external_id: 'baz' }
+  puts "LOG: data[:presidents] = #{data[:presidents]}"
+
+
+  data[:session] = xmldoc.elements['akomaNtoso/debate/debateBody/debateSection/heading'].text
+  puts "LOG: data[:session] = #{data[:session].to_s}"
+
+  data[:transcript] = ARGV[1] 
+  puts "LOG: data[:transcript] = #{data[:transcript]}"
+
+  data[:order] = 'foo bar baz order'
+  puts "LOG: data[:order] = #{data[:order]}"
+
+  data[:external_id] = 'foo bar baz external_id'
+  puts "LOG: data[:external_id] = #{data[:external_id]}"
+
+  data[:name] = 'foo bar baz name'
+  puts "LOG: data[:name] = #{data[:name]}"
+
+  data[:party] = 'foo bar baz party '
+  puts "LOG: data[:party] = #{data[:party]}"
+  
+  data[:time] = 'foo bar baz time'
+  puts "LOG: data[:time] = #{data[:time]}"
+
+  raise
+  data[:text] = 'foo bar baz text'
+  puts "LOG: data[:text] = #{data[:text]}"
+
+  data[:title] = 'foo bar baz title'
+  puts "LOG: data[:title] = #{data[:title]}"
+
+  data
+
+end
+
+def convert(xml_file)
+  xmldoc = get_xml(xml_file)
+  
+  puts 'LOG: we are ready for parsing'
+  tempdata = parse xmldoc
+
+
+  #TODO: set right json name
+  
+  name = File.basename(File.expand_path(xml_file),'.xml') + '.json'
+  File.open(name,'w'){ |f| f << JSON.pretty_generate(tempdata) }
+  puts "LOG: #{name} has writed"
+
+end
+
+case ARGV[0]
+  when 'convert'
+    if ARGV[1]==nil then
+      puts 'Error: a xml file name need'
+      return 0;
+    end
+
+    filename = ARGV[1]
+    File.open(File.expand_path(filename)) do |f|
+      convert(f)
+    end
+
+  else
+    STDOUT.puts <<-EOF
+  Please provide command name
+
+  Usage:
+    xml2hdojson convert xml-filename
+  EOF
+
+end
+

@@ -1,0 +1,15 @@
+{
+  "presidents": {
+    "name": "foo bar",
+    "external_id": "baz"
+  },
+  "session": "2012",
+  "transcript": "acta-02-12-julio-31-de-2012-f.xml",
+  "order": "foo bar baz order",
+  "external_id": "foo bar baz external_id",
+  "name": "foo bar baz name",
+  "party": "foo bar baz party ",
+  "time": "foo bar baz time",
+  "text": "foo bar baz text",
+  "title": "foo bar baz title"
+}

@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+gem 'pry-rescue'
+gem 'pry-stack_explorer'
+gem 'pry-doc'
+
