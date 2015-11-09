@@ -3,83 +3,101 @@ require 'json'
 require 'rexml/document'
 include REXML
 
-def get_xml file
-  xmldoc = Document.new(file)
+LOG = false
+
+class Parser
+
+  def parse(doc)
+    doc = clean_special(doc)
+    tempdata = map(doc)
+
+  end
+
+  private
+
+  def map(xmldoc)
+    data = {}
+
+    data[:presidents] = { name: 'foo bar', external_id: 'baz' }
+    puts "LOG: data[:presidents] = #{data[:presidents]}" if LOG
+
+    data[:session] = xmldoc.elements['akomaNtoso/debate/debateBody/debateSection/heading'].text
+    puts "LOG: data[:session] = #{data[:session].to_s}" if LOG
+
+    data[:transcript] = ARGV[1] 
+    puts "LOG: data[:transcript] = #{data[:transcript]}" if LOG
+
+    data[:order] = 'foo bar baz order'
+    puts "LOG: data[:order] = #{data[:order]}" if LOG
+
+    data[:external_id] = 'foo bar baz external_id'
+    puts "LOG: data[:external_id] = #{data[:external_id]}" if LOG
+
+    data[:name] = 'foo bar baz name'
+    puts "LOG: data[:name] = #{data[:name]}" if LOG
+
+    data[:party] = 'foo bar baz party '
+    puts "LOG: data[:party] = #{data[:party]}" if LOG
+    
+    data[:time] = 'foo bar baz time'
+    puts "LOG: data[:time] = #{data[:time]}" if LOG
+
+    e = xmldoc.elements["//speech[@by='#dra-sandra-ovalle-garcia']"]
+    t = e.elements[2].texts.join 
+    data[:text] = t 
+    puts "LOG: data[:text] = #{data[:text]}" if LOG
+
+    data[:title] = 'foo bar baz title'
+    puts "LOG: data[:title] = #{data[:title]}" if LOG
+
+    data
+
+  end
+
+  def clean_special(doc)
+    raise
+
+  end
 
 end
 
-def parse xmldoc
-  data = {}
+def save_file(file_name, result)
+  name = File.basename(File.expand_path(file_name),'.xml') + '.json'
+  File.open(name,'w'){ |f| f << JSON.pretty_generate(result) }
 
-  data[:presidents] = { name: 'foo bar', external_id: 'baz' }
-  puts "LOG: data[:presidents] = #{data[:presidents]}"
-
-
-  data[:session] = xmldoc.elements['akomaNtoso/debate/debateBody/debateSection/heading'].text
-  puts "LOG: data[:session] = #{data[:session].to_s}"
-
-  data[:transcript] = ARGV[1] 
-  puts "LOG: data[:transcript] = #{data[:transcript]}"
-
-  data[:order] = 'foo bar baz order'
-  puts "LOG: data[:order] = #{data[:order]}"
-
-  data[:external_id] = 'foo bar baz external_id'
-  puts "LOG: data[:external_id] = #{data[:external_id]}"
-
-  data[:name] = 'foo bar baz name'
-  puts "LOG: data[:name] = #{data[:name]}"
-
-  data[:party] = 'foo bar baz party '
-  puts "LOG: data[:party] = #{data[:party]}"
-  
-  data[:time] = 'foo bar baz time'
-  puts "LOG: data[:time] = #{data[:time]}"
-
-  raise
-  data[:text] = 'foo bar baz text'
-  puts "LOG: data[:text] = #{data[:text]}"
-
-  data[:title] = 'foo bar baz title'
-  puts "LOG: data[:title] = #{data[:title]}"
-
-  data
+  puts "LOG: saved #{name}"
 
 end
 
-def convert(xml_file)
-  xmldoc = get_xml(xml_file)
-  
-  puts 'LOG: we are ready for parsing'
-  tempdata = parse xmldoc
+def convert(files)
+  files.each do |file|
+    doc = REXML::Document.new(open(file))
+    
+    unless doc.root.nil?
+      result = Parser.new.parse(doc)
+      puts "LOG: parced #{file}"
 
+      save_file(file, result)
 
-  #TODO: set right json name
-  
-  name = File.basename(File.expand_path(xml_file),'.xml') + '.json'
-  File.open(name,'w'){ |f| f << JSON.pretty_generate(tempdata) }
-  puts "LOG: #{name} has writed"
-
-end
-
-case ARGV[0]
-  when 'convert'
-    if ARGV[1]==nil then
-      puts 'Error: a xml file name need'
-      return 0;
+    else
+      puts "LOG[error] #{file} isn't xml format."
     end
 
-    filename = ARGV[1]
-    File.open(File.expand_path(filename)) do |f|
-      convert(f)
-    end
+    puts
 
-  else
-    STDOUT.puts <<-EOF
-  Please provide command name
+  end
+
+end
+
+unless ARGV.empty?
+  convert(ARGV)
+  
+else
+  puts <<-EOF
+  Please provide xml file(s) name or glob
 
   Usage:
-    xml2hdojson convert xml-filename
+    xml2hdojson xml-filename...
   EOF
 
 end
