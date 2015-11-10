@@ -1,64 +1,22 @@
 #!/usr/bin/env ruby
 require 'json'
+require 'awesome_print'
+require_relative 'parser'
 require 'rexml/document'
 include REXML
 
 LOG = false
 
-class Parser
+class MyLog
+  def self.l
+    if @logger.nil?
+      @logger=Logger.new STDOUT
+      @logger.level=Logger::DEBUG
 
-  def parse(doc)
-    doc = clean_special(doc)
-    tempdata = map(doc)
-
-  end
-
-  private
-
-  def map(xmldoc)
-    data = {}
-
-    data[:presidents] = { name: 'foo bar', external_id: 'baz' }
-    puts "LOG: data[:presidents] = #{data[:presidents]}" if LOG
-
-    data[:session] = xmldoc.elements['akomaNtoso/debate/debateBody/debateSection/heading'].text
-    puts "LOG: data[:session] = #{data[:session].to_s}" if LOG
-
-    data[:transcript] = ARGV[1] 
-    puts "LOG: data[:transcript] = #{data[:transcript]}" if LOG
-
-    data[:order] = 'foo bar baz order'
-    puts "LOG: data[:order] = #{data[:order]}" if LOG
-
-    data[:external_id] = 'foo bar baz external_id'
-    puts "LOG: data[:external_id] = #{data[:external_id]}" if LOG
-
-    data[:name] = 'foo bar baz name'
-    puts "LOG: data[:name] = #{data[:name]}" if LOG
-
-    data[:party] = 'foo bar baz party '
-    puts "LOG: data[:party] = #{data[:party]}" if LOG
-    
-    data[:time] = 'foo bar baz time'
-    puts "LOG: data[:time] = #{data[:time]}" if LOG
-
-    e = xmldoc.elements["//speech[@by='#dra-sandra-ovalle-garcia']"]
-    t = e.elements[2].texts.join 
-    data[:text] = t 
-    puts "LOG: data[:text] = #{data[:text]}" if LOG
-
-    data[:title] = 'foo bar baz title'
-    puts "LOG: data[:title] = #{data[:title]}" if LOG
-
-    data
+    end
+    @logger
 
   end
-
-  def clean_special(doc)
-    raise
-
-  end
-
 end
 
 def save_file(file_name, result)
@@ -71,10 +29,10 @@ end
 
 def convert(files)
   files.each do |file|
-    doc = REXML::Document.new(open(file))
-    
-    unless doc.root.nil?
-      result = Parser.new.parse(doc)
+    source = REXML::Document.new(open(file))
+    unless source.root.nil?
+      parser = Parser.new(source)
+      result = parser.parse
       puts "LOG: parced #{file}"
 
       save_file(file, result)

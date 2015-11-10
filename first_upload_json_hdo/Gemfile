@@ -4,4 +4,5 @@ gem 'pry-rescue'
 gem 'pry-stack_explorer'
 gem 'pry-doc'
 gem 'pry-state'
+gem 'awesome_print'
 
