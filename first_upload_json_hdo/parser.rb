@@ -1,6 +1,12 @@
 class Parser
-  def initialize(doc)
+  #
+  #@doc: REXML::Document
+  #@opt: file_name: xml source file name
+  #output: Hash
+
+  def initialize(doc, options)
     @doc = doc
+    @xml_name = options[:file_name]
 
   end
 
@@ -20,7 +26,7 @@ class Parser
 
     data[:session] = @data.elements['akomaNtoso/debate/debateBody/debateSection/heading'].text
 
-    data[:transcript] = ARGV[1] 
+    data[:transcript] = @xml_name
 
     data[:order] = 'foo bar baz order'
 
@@ -48,7 +54,7 @@ class Parser
   end
 
   def log(key)
-    puts "LOG: data[key] = #{data[key]}" if LOG
+    #puts "LOG: data[key] = #{data[key]}" if LOG
 
   end
 

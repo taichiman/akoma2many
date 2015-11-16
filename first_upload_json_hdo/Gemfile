@@ -6,3 +6,4 @@ gem 'pry-doc'
 gem 'pry-state'
 gem 'awesome_print'
 
+gem 'rspec'

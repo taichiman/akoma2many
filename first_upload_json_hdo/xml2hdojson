@@ -19,19 +19,26 @@ class MyLog
   end
 end
 
-def save_file(file_name, result)
-  name = File.basename(File.expand_path(file_name),'.xml') + '.json'
-  File.open(name,'w'){ |f| f << JSON.pretty_generate(result) }
+class Saver
+  def initialize path
+    @path = path 
 
-  puts "LOG: saved #{name}"
+  end
 
+  def save_file(file_name, result)
+    name = File.basename(File.expand_path(file_name),'.xml') + '.json'
+    File.open(name,'w'){ |f| f << JSON.pretty_generate(result) }
+
+    puts "LOG: saved #{name}"
+
+  end
 end
 
 def convert(files)
   files.each do |file|
     source = REXML::Document.new(open(file))
     unless source.root.nil?
-      parser = Parser.new(source)
+      parser = Parser.new(source, {file_name: file})
       result = parser.parse
       puts "LOG: parced #{file}"
 
