@@ -3,21 +3,13 @@ require 'json'
 require 'awesome_print'
 require_relative 'parser'
 require 'rexml/document'
+require_relative 'utils'
+
 include REXML
+include Utils
 
-LOG = false
-
-class MyLog
-  def self.l
-    if @logger.nil?
-      @logger=Logger.new STDOUT
-      @logger.level=Logger::DEBUG
-
-    end
-    @logger
-
-  end
-end
+Utils::LOG = true
+OUTPUT_PATH = nil
 
 class Saver
   def initialize path
@@ -54,16 +46,48 @@ def convert(files)
 
 end
 
-unless ARGV.empty?
-  convert(ARGV)
-  
-else
+require 'getoptlong'
+require 'pry'
+
+def print_help
   puts <<-EOF
   Please provide xml file(s) name or glob
 
   Usage:
     xml2hdojson xml-filename...
   EOF
+  exit 0
 
 end
+
+opts = GetoptLong.new(
+  ['--help', '-h', GetoptLong::NO_ARGUMENT],
+  ['--output-path', '-p', GetoptLong::REQUIRED_ARGUMENT]
+)
+
+begin
+  opts.each do |opt, arg|
+    case opt
+      when '--help'
+        print_help
+      when '--output_path' 
+        unless arg.empty?
+          OUTPUT_PATH = arg
+          FileUtils.mkdir_r json_path
+        else
+          OUTPUT_PATH = Dir.pwd
+        end
+    end
+  end
+
+rescue GetoptLong::InvalidOption
+  print_help
+  exit 0
+end
+
+p ARGV
+#unless ARGV.empty?
+  #convert(ARGV)
+
+#end
 
