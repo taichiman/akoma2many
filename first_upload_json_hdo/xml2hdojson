@@ -1,93 +1,28 @@
 #!/usr/bin/env ruby
 require 'json'
 require 'awesome_print'
-require_relative 'parser'
 require 'rexml/document'
+require_relative 'parser'
 require_relative 'utils'
+require_relative 'settings'
+
+require 'pry'
 
 include REXML
 include Utils
 
 Utils::LOG = true
-OUTPUT_PATH = nil
+l 'start..'
 
-class Saver
-  def initialize path
-    @path = path 
+unless ARGV.empty?
+  OUTPUT_PATH = output_path_create(cli_options)
 
-  end
-
-  def save_file(file_name, result)
-    name = File.basename(File.expand_path(file_name),'.xml') + '.json'
-    File.open(name,'w'){ |f| f << JSON.pretty_generate(result) }
-
-    puts "LOG: saved #{name}"
-
-  end
-end
-
-def convert(files)
-  files.each do |file|
-    source = REXML::Document.new(open(file))
-    unless source.root.nil?
-      parser = Parser.new(source, {file_name: file})
-      result = parser.parse
-      puts "LOG: parced #{file}"
-
-      save_file(file, result)
-
-    else
-      puts "LOG[error] #{file} isn't xml format."
-    end
-
-    puts
-
-  end
-
-end
-
-require 'getoptlong'
-require 'pry'
-
-def print_help
-  puts <<-EOF
-  Please provide xml file(s) name or glob
-
-  Usage:
-    xml2hdojson xml-filename...
-  EOF
-  exit 0
-
-end
-
-opts = GetoptLong.new(
-  ['--help', '-h', GetoptLong::NO_ARGUMENT],
-  ['--output-path', '-p', GetoptLong::REQUIRED_ARGUMENT]
-)
-
-begin
-  opts.each do |opt, arg|
-    case opt
-      when '--help'
-        print_help
-      when '--output_path' 
-        unless arg.empty?
-          OUTPUT_PATH = arg
-          FileUtils.mkdir_r json_path
-        else
-          OUTPUT_PATH = Dir.pwd
-        end
-    end
-  end
-
-rescue GetoptLong::InvalidOption
-  print_help
-  exit 0
-end
-
-p ARGV
-#unless ARGV.empty?
+  l OUTPUT_PATH , :output_path
+  l ARGV
   #convert(ARGV)
+else
+  puts print_help
+  exit 0
 
-#end
+end
 
