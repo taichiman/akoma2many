@@ -6,6 +6,10 @@ def print_help
 
   Usage:
     xml2hdojson xml-filename...
+
+    --help -h
+    --output_path -p
+
   EOF
 
 end
@@ -25,7 +29,7 @@ def cli_options
         when '--help'
           print_help
         when '--output-path' 
-          cli_opts[:output_path] = arg
+          cli_opts[:output_path] = File.absolute_path(arg)
       end
     end
     cli_opts

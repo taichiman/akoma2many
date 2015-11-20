@@ -5,6 +5,7 @@ require 'rexml/document'
 require_relative 'parser'
 require_relative 'utils'
 require_relative 'settings'
+require_relative 'convert'
 
 require 'pry'
 
@@ -12,14 +13,12 @@ include REXML
 include Utils
 
 Utils::LOG = true
-l 'start..'
+puts 'start..'.green
 
 unless ARGV.empty?
   OUTPUT_PATH = output_path_create(cli_options)
 
-  l OUTPUT_PATH , :output_path
-  l ARGV
-  #convert(ARGV)
+  convert(ARGV)
 else
   puts print_help
   exit 0
